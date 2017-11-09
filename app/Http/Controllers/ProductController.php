@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Cart;
-Use App\Product;
-Use Illuminate\Http\Request;
-Use App\Http\Requests;
+use App\Product;
+use Illuminate\Http\Request;
+use App\Http\Requests;
 use Session;
 
 class ProductController extends Controller
@@ -15,29 +15,22 @@ class ProductController extends Controller
         $products = Product::all();
         return view('coffee.index', ['products' => $products]);
     }
-
-    public function getAddToCart(Request $request,$id){
+    public function getAddToCart(Request $request, $id) {
         $product = Product::find($id);
-        $cart = Session::has('cart') ? Session::get('cart') : null;
-       // $cart = new Cart($oldCart);
-       if(!$cart)
-       {
-           $cart = new Cart($cart);
-       }
+        $oldCart = Session::has('cart') ? Session::get('cart') : null;
+        $cart = new Cart($oldCart);
         $cart->add($product, $product->id);
-
-        Session::put('cart', $cart);
-        //$request->session()->put('cart', $cart);
+        $request->session()->put('cart', $cart);
         return redirect()->route('product.index');
     }
 
     public function getCart() {
-        if (Session::has('cart')) {
+        if (!Session::has('cart')) {
             return view('coffee.shopping-cart');
         }
         $oldCart = Session::get('cart');
         $cart = new Cart($oldCart);
-        return view('shop.shopping-cart', ['products' => $cart->items, 'totalPrice' => $cart->totalPrice]);
-        
+        return view('coffee.shopping-cart', ['products' => $cart->items, 'totalPrice' => $cart->totalPrice]);
+
     }
 }
